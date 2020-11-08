@@ -24,7 +24,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					}
 					?>
 				</ul>
-				<ul id="ul_eqLogic" class="nav nav-list bs-sidenav">Mes filtres
+				<ul id="ul_eqLogic" class="nav nav-list bs-sidenav filtres" style="display:none">Mes filtres
 				<a class="btn btn-default eqLogicAction" style="width : 100%;margin-top : 5px;margin-bottom: 5px;" data-action="ajout_filtre"><i class="fa fa-plus-circle"></i> {{Ajouter un filtre}}</a>
 					<?php
 					

@@ -37,7 +37,6 @@ class google_agenda extends eqLogic {
 			try {
 				if ($eqLogic->getConfiguration("type_equipement") =="filtre"){
 					log::add('google_agenda', 'debug', "Nom équipement: " . $eqLogic->getHumanName());
-					//log::add('google_agenda', 'debug', "Type équipement: " . "filtre");
 					$eqLogic->recup_filtre();
 					log::add('google_agenda', 'debug', "--------------------------------------------------------------------");
 				}
@@ -53,7 +52,6 @@ class google_agenda extends eqLogic {
 			try {
 				if ($eqLogic->getConfiguration("type_equipement") =="agenda"){
 					log::add('google_agenda', 'debug', "Nom équipement: " . $eqLogic->getHumanName());
-					//log::add('google_agenda', 'debug', "Type équipement :" . "agenda");
 					$eqLogic->Synchronisation_google();
 					log::add('google_agenda', 'debug', "--------------------------------------------------------------------");
 				}

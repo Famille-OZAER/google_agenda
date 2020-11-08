@@ -16,16 +16,14 @@
  */
 
 
- $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
+$("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 $('document').ready(function(){
-	//console.log($('div #equipements_agendas .eqLogicDisplayCard'))
-	return;
 	if ($('div #equipements_agendas .eqLogicDisplayCard').length != 0){
 		$('#btn_filtre').show();
 		$('#legende_filtres').show();
 		$('#equipements_filtres').show();
-		var p = $('div .eqLogicAction').first();
-$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
+      	$('.bs-sidebar .filtres').show();
+		$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
 	}
 });
 $('#bt_linkToUser').on('click', function () {
@@ -83,7 +81,6 @@ function addCmdToTable(_cmd) {
     jeedom.cmd.changeType($('#table_cmd tbody tr:last'), init(_cmd.subType));
 }
 function printEqLogic(_eqLogic) {
-    //$('.nav-tabs a[href="#eqlogictab"]').tab('show');
 	actionOptions = [];
 	if (!isset(_eqLogic)) {var _eqLogic = {configuration: {}};}
 	if (!isset(_eqLogic.configuration)) {_eqLogic.configuration = {};}
@@ -279,8 +276,8 @@ function updateCalendarList(_eqLogic){
 $('.eqLogicAction[data-action=ajout_filtre]').on('click', function () {
     bootbox.prompt("{{Nom du filtre?}}", function (result) {
         if (result !== null) {
-			$.ajax({// fonction permettant de faire de l'ajax
-				type: "POST", // methode de transmission des données au fichier php
+			$.ajax({
+				type: "POST", 
 				url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
 				data: {
 					action: "ajout_filtre",
@@ -290,7 +287,7 @@ $('.eqLogicAction[data-action=ajout_filtre]').on('click', function () {
 				error: function(request, status, error) {
 					handleAjaxError(request, status, error);
 				},
-				success: function(data) { // si l'appel a bien fonctionné
+				success: function(data) { 
 					if (data.state != 'ok') {
 						$('#div_alert').showAlert({message:  data.result,level: 'danger'});
 						return;
@@ -307,8 +304,8 @@ $('.eqLogicAction[data-action=ajout_agenda]').on('click', function () {
 	
     bootbox.prompt("{{Nom de l'agenda?}}", function (result) {
         if (result !== null) {
-			$.ajax({// fonction permettant de faire de l'ajax
-				type: "POST", // methode de transmission des données au fichier php
+			$.ajax({
+				type: "POST", 
 				url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
 				data: {
 					action: "ajout_agenda",
@@ -318,7 +315,7 @@ $('.eqLogicAction[data-action=ajout_agenda]').on('click', function () {
 				error: function(request, status, error) {
 					handleAjaxError(request, status, error);
 				},
-				success: function(data) { // si l'appel a bien fonctionné
+				success: function(data) { 
 					if (data.state != 'ok') {
 						$('#div_alert').showAlert({message:  data.result,level: 'danger'});
 						return;
@@ -401,7 +398,7 @@ function addEvent(_action,_type, _name, _el,id) {
 
 
     var div = '<div class="' + _type + '">';
-	//div += '<div class="form-group ">';
+
 	var actionOption_id = uniqId();
 
 	
@@ -414,16 +411,15 @@ function addEvent(_action,_type, _name, _el,id) {
 		div += "<option value='heure'>A l'heure du début l'évènement";
 		div += "<option value='jour'>Au début de la journée";
 		div += "</select>";
-		//div += '</div>';
+		
 	}else{
 		div += "<label class='col-sm-4 checkbox-inline'>Moment du déclenchement</label>";
 		div += "<select class='expressionAttr form-control col-sm-5' data-l1key='moment'>";
 		div += "<option value='heure'>A l'heure de fin de l'évènement";
 		div += "<option value='jour'>A la fin de la journée";
 		div += "</select>";
-		//div += '</div>';
+		
 	}
-   // div += '<label class="col-sm-1 control-label"></label>';
     div += '<div class="col-sm-4">';
     div += '<div class="input-group">';
  	div += '<span class=" input-sm input-group-addon roundedLeft"style="width: 100px">' + _name + '</span>';
