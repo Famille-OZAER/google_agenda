@@ -1,1 +1,3 @@
+<img align="right" src="plugin_info/google_agenda_icon.png" width="150">
+Plugin basé le plugin google agenda de Jeedom SAS et permettant de recuperer les événements de Google Agenda. Il est capable d’interpréter les titres des événements comme interaction.IMPORTANT : ce plugin nécessite d'avoir un compte dev chez Google (tout le monde peut en avoir c'est gratuit et sans impact). La démarche est expliqué dans la documentation.
 # google_agenda
