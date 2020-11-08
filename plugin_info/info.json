@@ -1,0 +1,18 @@
+{
+    "id": "google_agenda",
+    "name": "Google agenda",
+    "description": "Plugin basé le plugin google agenda de Jeedom SAS et permettant de recuperer les événements de Google Agenda. Il est capable d’interpréter les titres des événements comme interaction.IMPORTANT : ce plugin nécessite d'avoir un compte dev chez Google (tout le monde peut en avoir c'est gratuit et sans impact). La démarche est expliqué dans la documentation. ",
+    "licence": "AGPL",
+    "require": "3.0",
+    "category": "organization",
+    "changelog": "",
+    "documentation": "",
+    "author": "OZAER Michaël",
+    "compatibility": [
+        "miniplus",
+        "smart",
+        "rpi",
+        "docker",
+        "diy"
+    ]
+}
