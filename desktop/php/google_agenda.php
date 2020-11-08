@@ -2,7 +2,7 @@
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
-$plugin = plugin::byId('Google_agenda');
+$plugin = plugin::byId('google_agenda');
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
 ?>
@@ -153,7 +153,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{URL de retour}}</label>
 							<div class="col-sm-9">
-								<span><?php echo network::getNetworkAccess('external') . '/plugins/Google_agenda/core/php/callback.php?apikey=' . jeedom::getApiKey('Google_agenda') . '&eqLogic_id='; ?><span class="span_googleCallbackId"></span></span>
+								<span><?php echo network::getNetworkAccess('external') . '/plugins/google_agenda/core/php/callback.php?apikey=' . jeedom::getApiKey('google_agenda') . '&eqLogic_id='; ?><span class="span_googleCallbackId"></span></span>
 							</div>
 						</div>
 							<div class="form-group">
@@ -268,5 +268,5 @@ $eqLogics = eqLogic::byType($plugin->getId());
 	</div>
 </div>
 
-<?php include_file('desktop', 'Google_agenda', 'js', 'Google_agenda');?>
+<?php include_file('desktop', 'google_agenda', 'js', 'google_agenda');?>
 <?php include_file('core', 'plugin.template', 'js');?>

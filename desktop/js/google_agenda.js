@@ -31,7 +31,7 @@ $('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);
 $('#bt_linkToUser').on('click', function () {
     $.ajax({
         type: "POST", 
-        url: "plugins/Google_agenda/core/ajax/Google_agenda.ajax.php", 
+        url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
         data: {
             action: "linkToUser",
             id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -187,7 +187,7 @@ function saveEqLogic(_eqLogic) {
 $('#bt_MAJ_agendas').on('click', function() {
 	 $.ajax({
 		type: "POST", 
-		url: "plugins/Google_agenda/core/ajax/Google_agenda.ajax.php", 
+		url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
 		data: {
 			action: "get_eqlogic",
 			id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -213,7 +213,7 @@ function updateCalendarList(_eqLogic){
 	var agendas=[];
  $.ajax({
     type: "POST", 
-    url: "plugins/Google_agenda/core/ajax/Google_agenda.ajax.php", 
+    url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
     data: {
         action: "listCalendar",
         id: $('.eqLogic .eqLogicAttr[data-l1key=id]').value()
@@ -281,7 +281,7 @@ $('.eqLogicAction[data-action=ajout_filtre]').on('click', function () {
         if (result !== null) {
 			$.ajax({// fonction permettant de faire de l'ajax
 				type: "POST", // methode de transmission des données au fichier php
-				url: "plugins/Google_agenda/core/ajax/Google_agenda.ajax.php", 
+				url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
 				data: {
 					action: "ajout_filtre",
 					name: result
@@ -309,7 +309,7 @@ $('.eqLogicAction[data-action=ajout_agenda]').on('click', function () {
         if (result !== null) {
 			$.ajax({// fonction permettant de faire de l'ajax
 				type: "POST", // methode de transmission des données au fichier php
-				url: "plugins/Google_agenda/core/ajax/Google_agenda.ajax.php", 
+				url: "plugins/google_agenda/core/ajax/google_agenda.ajax.php", 
 				data: {
 					action: "ajout_agenda",
 					name: result

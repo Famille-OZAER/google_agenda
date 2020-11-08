@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 include_file('core', 'authentification', 'php');
-if (!jeedom::apiAccess(init('apikey'), 'Google_agenda')) {
+if (!jeedom::apiAccess(init('apikey'), 'google_agenda')) {
 	echo 'Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action';
 	die();
 }
@@ -34,7 +34,7 @@ try {
 	$eqLogic->setConfiguration('refreshToken', $accessToken->getRefreshToken());
 	$eqLogic->save();
 
-	redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=Google_agenda&m=Google_agenda&id=' . $eqLogic->getId());
+	redirect(network::getNetworkAccess('external') . '/index.php?v=d&p=google_agenda&m=google_agenda&id=' . $eqLogic->getId());
 } catch (Exception $e) {
 	exit(print_r($e));
 }

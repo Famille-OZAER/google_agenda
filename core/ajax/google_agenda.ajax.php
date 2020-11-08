@@ -49,11 +49,11 @@ try {
 		ajax::success($eqLogic->listCalendar());
 	}
 	if (init('action') == 'ajout_agenda') {
-		Google_agenda::ajout_agenda(init('name'));
+		google_agenda::ajout_agenda(init('name'));
 		ajax::success();
 	}
 	if (init('action') == 'ajout_filtre') {
-		Google_agenda::ajout_filtre(init('name'));
+		google_agenda::ajout_filtre(init('name'));
 		ajax::success();
     }
 		
