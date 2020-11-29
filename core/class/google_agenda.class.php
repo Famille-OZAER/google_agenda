@@ -426,6 +426,7 @@ class google_agenda extends eqLogic {
 					continue;
 				}	
 			}
+			
 			//Vérification des commandes fin
 			$cmd_demain=cmd::byEqLogicIdAndLogicalId($this->getId(),"demain");
 			if(!is_object($cmd_demain)){
