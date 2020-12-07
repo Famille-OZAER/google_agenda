@@ -21,7 +21,6 @@ $('document').ready(function(){
 	if ($('div #equipements_agendas .eqLogicDisplayCard').length != 0){
 		$('#btn_filtre').show();
 		$('#legende_filtres').show();
-		$('#equipements_filtres').show();
       	$('.bs-sidebar .filtres').show();
 		$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
 	}

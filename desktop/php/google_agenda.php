@@ -82,16 +82,16 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
 			}
 		</script>
-		<legend style="display:none" id="legende_filtres"><i class="fa fa-table" ></i> {{Mes Filtres}}</legend>
-		<div class="eqLogicThumbnailContainer" style="display:none" id="equipements_filtres">
+		<legend id="legende_filtres"><i class="fa fa-table" ></i> {{Mes Filtres}}</legend>
+		<div class="eqLogicThumbnailContainer"  id="equipements_filtres">
 			<?php
 			foreach ($eqLogics as $eqLogic) {
 				if ($eqLogic->getConfiguration('type_equipement') == 'filtre') {
 					$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
 					echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="text-align: center; background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-					echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
-					echo "<br>";
-					echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
+							echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
+							echo "<br>";
+							echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
 					echo '</div>';
 				}
 			}
