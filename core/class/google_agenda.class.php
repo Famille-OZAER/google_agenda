@@ -450,19 +450,19 @@ class google_agenda extends eqLogic {
 						$options = array();
 						if (isset($cmd['options'])) {
 							$options = $cmd['options'];
-							log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd['cmd']);
-							log::add('google_agenda_execution', 'debug', 'execution action fin: ' . implode(" " ,$cmd['options']));
+							//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd['cmd']);
+							//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . implode(" " ,$cmd['options']));
 							scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
 						}else{
 							if (is_numeric (trim($cmd['cmd'], "#"))){
 								$cmd=cmd::byId(trim($cmd['cmd'], "#"));
 								if(is_object($cmd)){
-									log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd->getHumanName());
+									//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd->getHumanName());
 									$cmd->execCmd();
 								}
 							}else{
-								log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd['cmd']);
-								log::add('google_agenda_execution', 'debug', 'execution action fin: ' . implode(" " ,$cmd['options']));
+								//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd['cmd']);
+								//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . implode(" " ,$cmd['options']));
 								scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
 							}
 						}
