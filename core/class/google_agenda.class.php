@@ -232,10 +232,7 @@ class google_agenda extends eqLogic {
 		if (count($evenements) > 0) {
 			$this->setCache('evenements', $evenements);
 		}
-		$cmd = $this->getCmd(null, 'lastsync');
-		if (is_object($cmd)) {
-			$cmd->event(date('Y-m-d H:i:s'));
-		}
+		$this->checkAndUpdateCmd('lastsync', date('Y-m-d H:i:s'));
 		$this->checkAndUpdateCmd('maintenant', $this->recup_evenements_en_cours());
 		$this->checkAndUpdateCmd('aujourdhui', $this->recup_evenements_du_jour());
 		$this->checkAndUpdateCmd('demain', $this->recup_evenement_demain());
