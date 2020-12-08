@@ -440,7 +440,7 @@ class google_agenda extends eqLogic {
 					if($cmd_demain->execCmd() == 0){	
 						$execute_action = 1;
 					}else{
-						log::add('google_agenda_execution', 'debug', "Pas d'execution de l'action de fin du jour car il existe le même événement demain.");
+						//log::add('google_agenda_execution', 'debug', "Pas d'execution de l'action de fin du jour car il existe le même événement demain.");
 					}
 				}else if ($cmd['moment'] == "heure" &&  date('d/m/Y H:i',$evenement_aujourdhui["fin"]) == date('d/m/Y H:i',strtotime("now")) ){
 					$execute_action =1;
