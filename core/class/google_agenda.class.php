@@ -29,36 +29,57 @@ use Psr\Http\Message\ResponseInterface;
 
 class google_agenda extends eqLogic {
   /*     * *************************Attributs****************************** */
+  var $cron_en_cours=false;
+  static function add_log($level = 'debug',$Log){
+	
+	if (is_array($Log)) $Log = json_encode($Log);
+	$function_name = debug_backtrace(false, 2)[1]['function'];
+	$ligne = debug_backtrace(false, 2)[0]['line'];
+	//$class_name = debug_backtrace(false, 2)[1]['class'];
+	$msg = '<'. $function_name .' (' . $ligne . ')> '.$Log;
+	//$nom_eq=mb_convert_encoding (str_replace("[" , "_",str_replace("]" , "",$_eqLogic->getHumanName(false))), 'HTML-ENTITIES', 'UTF-8');
+	
+	log::add('google_agenda'  , $level,$msg);
 
+				
+}
 	public static function cron() {
-		log::add('google_agenda', 'debug', "********************************************************************");
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__);
+		$cron_en_cours=true;
 		foreach (self::byType('google_agenda') as $eqLogic) {
 			try {
 				if ($eqLogic->getConfiguration("type_equipement") =="filtre"){
-					log::add('google_agenda', 'debug', "Nom équipement: " . $eqLogic->getHumanName());
+					google_agenda::add_log("debug", "--------------------------------------------------------------------");
+					google_agenda::add_log("debug","Nom équipement: " . $eqLogic->getHumanName());
 					$eqLogic->recup_filtre();
-					log::add('google_agenda', 'debug', "--------------------------------------------------------------------");
 				}
 			} catch (Exception $e) {
-				log::add('google_agenda', 'warning', __('Erreur sur : ', __FILE__) . $eqLogic->getHumanName() . ' => ' . $e->getMessage());
+				google_agenda::add_log("warning",'Erreur sur : '. $eqLogic->getHumanName() . ' => ' . $e->getMessage());
 			}
 		}
 	}
 	public static function cron5() {
-		log::add('google_agenda', 'debug', "********************************************************************");
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__);
+		
+		if ($cron_en_cours==true){
+			google_agenda::add_log("debug","cron en cours: attente ");
+		}
+		while ($cron_en_cours == true) {
+			
+		}
 		foreach (self::byType('google_agenda') as $eqLogic) {
 			try {
 				if ($eqLogic->getConfiguration("type_equipement") =="agenda"){
-					log::add('google_agenda', 'debug', "Nom équipement: " . $eqLogic->getHumanName());
+					google_agenda::add_log("debug","--------------------------------------------------------------------");
+					google_agenda::add_log("debug","Nom équipement: " . $eqLogic->getHumanName());
+					
 					$eqLogic->Synchronisation_google();
-					log::add('google_agenda', 'debug', "--------------------------------------------------------------------");
+					
+					
 				}
 			} catch (Exception $e) {
-				log::add('google_agenda', 'warning', __('Erreur sur : ', __FILE__) . $eqLogic->getHumanName() . ' => ' . $e->getMessage());
+				google_agenda::add_log("warning",'Erreur sur : '. $eqLogic->getHumanName() . ' => ' . $e->getMessage());
 			}
 		}
+		google_agenda::add_log("debug","********************************************************************");
 	}
   /*     * ***********************Methode static*************************** */
 	public function ping() {
@@ -67,8 +88,6 @@ class google_agenda extends eqLogic {
 		exec($exec_string, $output, $return);
 		$output = array_values(array_filter($output));
 		
-		
-		log::add('google_agenda', 'error',  $output);
 		if (!empty($output[1])) {
 			if (count($output) >= 5) {
 				$response = preg_match("/time(?:=|<)(?<time>[\.0-9]+)(?:|\s)ms/", $output[count($output)-4], $matches);
@@ -136,13 +155,14 @@ class google_agenda extends eqLogic {
 	}
 
 	public function listCalendar() {
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__);
+	
 		if( $this->ping()=="NOK"){
-			log::add('google_agenda', 'debug', "Connection internet: NOK");
-			log::add('google_agenda', 'debug', "Arrêt de la fonction");
+			google_agenda::add_log("debug","Connection internet: NOK");
+			google_agenda::add_log("debug","Arrêt de la fonction");
+			
 			return;
 		}
-		log::add('google_agenda', 'debug', "Connection internet: OK");
+		google_agenda::add_log("debug","Connection internet: OK");
 		
 		if ($this->getConfiguration('accessToken') == '') {
 			return array();
@@ -158,34 +178,41 @@ class google_agenda extends eqLogic {
 	}
 
 	public function Synchronisation_google() {
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__);
 		if($this->getIsEnable() == 0) {
-			log::add('google_agenda', 'debug', "Equipement désactivé.");
+			google_agenda::add_log("debug","Equipement désactivé.");
 			return;
 		}
 		if( $this->ping()=="NOK"){
-			log::add('google_agenda', 'debug', "Connection internet: NOK");
-			log::add('google_agenda', 'debug', "Arrêt de la fonction");
+			google_agenda::add_log("debug","Connection internet: NOK");
+			google_agenda::add_log("debug","Arrêt de la fonction");
 			return;
 		}
 		if (!is_array($this->getConfiguration('agendas')) || count($this->getConfiguration('agendas')) == 0) {
-			log::add('google_agenda', 'debug', "Aucun angenda enregistré");
+			google_agenda::add_log("debug","Aucun angenda enregistré");
 			return;
 		}
 		$agendas=$this->getConfiguration('agendas');
 		foreach ($agendas as $agenda) {
-			//log::add('google_agenda_test', 'debug',json_encode($agenda));
+			//google_agenda::add_log("debug",json_encode($agenda));
 			foreach ($agenda as $key => $value) {
-				if ($key == "agenda_id"){$agenda_id = $value;}
-				if ($key == "checked"){$agenda_actif = intval($value);}
+				if ($key == "agenda_id"){
+					$agenda_id = $value;
+					//google_agenda::add_log("debug","agenda_id: ".$agenda_id);
+				}
+				if ($key == "checked"){
+					$agenda_actif = intval($value);
+					//google_agenda::add_log("debug","agenda_actif: ".$agenda_actif);
+				}
 			}
 			if ($agenda_actif == 0) {
+				//google_agenda::add_log("debug","Agenda inactif");
 				continue;
 			}
 			
 			try {
+				
 				foreach ($this->getEvents($agenda_id) as $event) {
-					//log::add('google_agenda_test', 'debug', json_encode($event));
+					//google_agenda::add_log("debug", json_encode($this->getEvents($agenda_id)));
 					if(isset($event['summary'])){
 						$Nom=$event['summary'];
 					}else{
@@ -223,12 +250,11 @@ class google_agenda extends eqLogic {
 					);
 				}
 			} catch (Exception $e) {
-				log::add('google_agenda', 'error', __('Erreur sur : ', __FILE__) . $calendarId . ' => ' . $e->getMessage());
+				google_agenda::add_log("error",'Erreur sur : '. $calendarId . ' => ' . $e->getMessage());
 				return;
 			}
 		}
-		
-		log::add('google_agenda', 'debug', 'evenements : ' . json_encode($evenements));
+		google_agenda::add_log("debug",'evenements : ' . json_encode($evenements));
 		if (count($evenements) > 0) {
 			$this->setCache('evenements', $evenements);
 		}
@@ -246,13 +272,16 @@ class google_agenda extends eqLogic {
 		}
 		$now = strtotime('now');
 		foreach ($this->getCache('evenements') as $evenement) {
-			//log::add('google_agenda', 'debug',json_encode($evenement));
+			//google_agenda::add_log("debug",json_encode($evenement));
 			if (strtotime($evenement['Debut']) <= $now && strtotime($evenement['Fin']) >= $now) {
 				$return .= $evenement['Nom_évènement'] . ',';
 				continue;
 			}
 		}
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__ . ": " .trim($return, ',') );
+		if(trim($return, ',')!=""){
+			google_agenda::add_log("debug",trim($return, ','));
+		}
+		
 		return trim($return, ',');
 	}
 
@@ -281,7 +310,9 @@ class google_agenda extends eqLogic {
 				continue;
 			}
 		}
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__ . ": " .trim($return, ',') );
+		if(trim($return, ',')!=""){
+			google_agenda::add_log("debug",trim($return, ','));
+		}
 		return trim($return, ',');
 	}
 
@@ -293,7 +324,7 @@ class google_agenda extends eqLogic {
 		$starttime = strtotime('+1 day 00:00:00');
 		$endtime = strtotime('+1 day 23:59:59');
 		foreach ($this->getCache('evenements') as $evenement) {
-			//log::add('google_agenda', 'debug',json_encode($evenement));
+			//google_agenda::add_log("debug",json_encode($evenement));
 			$fullday=false;
 			$endtime_event = strtotime($evenement['Fin']);
 			if($evenement['Jour_entier'] == "Oui"){
@@ -311,7 +342,7 @@ class google_agenda extends eqLogic {
 				continue;
 			}
 		}
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__ . ": " .trim($return, ',') );
+		google_agenda::add_log("debug",trim($return, ','));
 		return trim($return, ',');
 	}
 	
@@ -335,14 +366,15 @@ class google_agenda extends eqLogic {
 			
 			
 		}
-		log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__ . ": " .trim($return, ',') );
+		if(trim($return, ',')!=""){
+			google_agenda::add_log("debug",trim($return, ','));
+		}
 		return trim($return, ',');
 	}
 	
 	public function recup_filtre(){
-		//log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__);
 		if($this->getIsEnable() == 0) {
-			log::add('google_agenda', 'debug', "Equipement désactivé.");
+			google_agenda::add_log("debug","Equipement désactivé.");
 			return;
 		}
 		
@@ -355,15 +387,15 @@ class google_agenda extends eqLogic {
 			
 			
 			if($trouve){
-				log::add('google_agenda', 'debug', "evenement aujourdhui : Oui");
-				log::add('google_agenda', 'debug', "trouvé : " . $trouve);
-				log::add('google_agenda', 'debug', "heure de début :". date('H:i',$evenement_aujourdhui["debut"]));
-				log::add('google_agenda', 'debug', "heure de fin :". date('H:i',$evenement_aujourdhui["fin"]));
+				google_agenda::add_log("debug","evenement aujourdhui : Oui");
+				google_agenda::add_log("debug","trouvé : " . $trouve);
+				google_agenda::add_log("debug","heure de début :". date('H:i',$evenement_aujourdhui["debut"]));
+				google_agenda::add_log("debug","heure de fin :". date('H:i',$evenement_aujourdhui["fin"]));
 				$this->checkAndUpdateCmd('debut',  date('H:i',$evenement_aujourdhui["debut"]));
 				$this->checkAndUpdateCmd('fin',  date('H:i',$evenement_aujourdhui["fin"]));
 				$this->checkAndUpdateCmd('aujourdhui', 1);
 			}else{
-				log::add('google_agenda', 'debug', "evenement aujourdhui : Non");
+				google_agenda::add_log("debug","evenement aujourdhui : Non");
 				$this->checkAndUpdateCmd('debut', "");
 				$this->checkAndUpdateCmd('fin', "");
 				$this->checkAndUpdateCmd('aujourdhui', 0);
@@ -371,10 +403,10 @@ class google_agenda extends eqLogic {
 			
 			$evenement_demain=$this->recup_infos_evenement($eqLogic_agenda,$filtre,false,$sur_titre,$sur_contenu, $trouve);
 			if ($trouve){
-				log::add('google_agenda', 'debug', "evenement demain : Oui");
+				google_agenda::add_log("debug","evenement demain : Oui");
 				$this->checkAndUpdateCmd('demain', 1);
 			}else{
-				log::add('google_agenda', 'debug', "evenement demain : Non");
+				google_agenda::add_log("debug","evenement demain : Non");
 				$this->checkAndUpdateCmd('demain', 0);
 			}
 			//Vérification des commandes début
@@ -399,25 +431,25 @@ class google_agenda extends eqLogic {
 							$options = array();
 							if (isset($cmd['options'])) {
 								$options = $cmd['options'];
-								log::add('google_agenda', 'debug', 'execution action début: ' . $cmd['cmd']);
-								log::add('google_agenda', 'debug', 'execution action début: ' . implode(" " ,$cmd['options']));
+								google_agenda::add_log("debug",'execution action début: ' . $cmd['cmd']);
+								google_agenda::add_log("debug",'execution action début: ' . implode(" " ,$cmd['options']));
 								scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
 							}else{
 								if (is_numeric (trim($cmd['cmd'], "#"))){
 									$cmd=cmd::byId(trim($cmd['cmd'], "#"));
 									if(is_object($cmd)){
-										log::add('google_agenda', 'debug', 'execution action début: ' . $cmd->getHumanName());
+										google_agenda::add_log("debug",'execution action début: ' . $cmd->getHumanName());
 										$cmd->execCmd();
 									}
 								}else{
-									log::add('google_agenda', 'debug', 'execution action début: ' . $cmd['cmd']);
-									log::add('google_agenda', 'debug', 'execution action début: ' . implode(" " ,$cmd['options']));
+									google_agenda::add_log("debug", 'execution action début: ' . $cmd['cmd']);
+									google_agenda::add_log("debug",'execution action début: ' . implode(" " ,$cmd['options']));
 									scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
 								}
 							}								
 							
 						}catch (Exception $e) {
-							log::add('google_agenda', 'error', __('Erreur lors de l\'éxecution de ', __FILE__) . $cmd['cmd'] . __('. Détails : ', __FILE__) . $e->getMessage());
+							google_agenda::add_log("error",'Erreur lors de l\'éxecution de '. $cmd['cmd'] . ' Détails : '. $e->getMessage());
 						}
 					}
 					continue;
@@ -440,7 +472,7 @@ class google_agenda extends eqLogic {
 					if($cmd_demain->execCmd() == 0){	
 						$execute_action = 1;
 					}else{
-						//log::add('google_agenda_execution', 'debug', "Pas d'execution de l'action de fin du jour car il existe le même événement demain.");
+						google_agenda::add_log("debug","Pas d'execution de l'action de fin du jour car il existe le même événement demain.");
 					}
 				}else if ($cmd['moment'] == "heure" &&  date('d/m/Y H:i',$evenement_aujourdhui["fin"]) == date('d/m/Y H:i',strtotime("now")) ){
 					$execute_action =1;
@@ -450,24 +482,25 @@ class google_agenda extends eqLogic {
 						$options = array();
 						if (isset($cmd['options'])) {
 							$options = $cmd['options'];
-							//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd['cmd']);
-							//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . implode(" " ,$cmd['options']));
+							google_agenda::add_log("debug",'execution action fin: ' . $cmd['cmd']);
+							google_agenda::add_log("debug",'execution action fin: ' . implode(" " ,$cmd['options']));
+						
 							scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
 						}else{
 							if (is_numeric (trim($cmd['cmd'], "#"))){
 								$cmd=cmd::byId(trim($cmd['cmd'], "#"));
 								if(is_object($cmd)){
-									//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd->getHumanName());
+									google_agenda::add_log("debug",'execution action fin: ' . $cmd->getHumanName());
 									$cmd->execCmd();
 								}
 							}else{
-								//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . $cmd['cmd']);
-								//log::add('google_agenda_execution', 'debug', 'execution action fin: ' . implode(" " ,$cmd['options']));
+								google_agenda::add_log("debug",'execution action fin: ' . $cmd['cmd']);
+								google_agenda::add_log("debug",'execution action fin: ' . implode(" " ,$cmd['options']));
 								scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
 							}
 						}
 					}catch (Exception $e) {
-						log::add('google_agenda', 'error', __('Erreur lors de l\'éxecution de ', __FILE__) . $cmd['cmd'] . __('. Détails : ', __FILE__) . $e->getMessage());
+						google_agenda::add_log("error", 'Erreur lors de l\'éxecution de ' . $cmd['cmd'] . ' Détails : ' . $e->getMessage());
 					}
 				}		
 				continue;
@@ -477,13 +510,12 @@ class google_agenda extends eqLogic {
 	}
 	
 	public function recup_infos_evenement($eqLogic_agenda,$filtre,$aujourdhui,$sur_titre,$sur_contenu, &$trouve) {
-		//log::add('google_agenda', 'debug', "Fonction : " . __FUNCTION__);
 		$return = "";
 		$trouve=false;
 		if (!is_array($eqLogic_agenda->getCache('evenements')) || count($eqLogic_agenda->getCache('evenements')) == 0) {
 			return $return;
 		}
-		//log::add('google_agenda', 'debug', "aujourdhui : ". $aujourdhui);
+		
 		if ($aujourdhui){
 			$starttime = strtotime('00:00:00');
 			$endtime = strtotime('23:59:59');
@@ -503,20 +535,15 @@ class google_agenda extends eqLogic {
 			}
 			if (strtotime($evenement['Debut']) <= $endtime && $endtime_event >= $starttime) {
 				
-				//if(strpos(strtolower($evenement['Nom_évènement']), strtolower($filtre))!== false){
-					//log::add('google_agenda', 'debug', "evenement : ". $evenement['Nom_évènement']);
-				//log::add('google_agenda', 'debug', 'evenement: ' . implode(" " ,$evenement));
 				$recherche_dans = '';
 				if ($sur_titre == 1){
 					$recherche_dans .= $evenement['Nom_évènement'];
-					//log::add('google_agenda', 'debug', "Nom_évènement : ". $evenement['Nom_évènement']);
+					
 				}
 				if ($sur_contenu == 1){
 					$recherche_dans .= $evenement['Description'];
-					//log::add('google_agenda', 'debug', "Description : ". $evenement['Description']);
-				}
-				//log::add('google_agenda', 'debug', "filtre : ". $filtre);
-				//log::add('google_agenda', 'debug', "recherche_dans : ". $recherche_dans);
+					}
+			
 				if(strpos(strtolower($recherche_dans), strtolower($filtre))!== false){
 					$trouve=true;
 					if ($return["debut"]>strtotime($evenement['Debut'])){
@@ -741,18 +768,19 @@ class google_agendaCmd extends cmd {
 
 	public function execute($_options = array()) {
 		if ($this->getLogicalId() == 'refresh') {
-			log::add('google_agenda', 'debug', "********************************************************************");
-			log::add('google_agenda', 'debug', "Rafraichir");
+			google_agenda::add_log("debug", "********************************************************************");
+			google_agenda::add_log("debug","Rafraichir");
+			
 			$eqLogic = $this->getEqLogic();
 			if ($eqLogic->getConfiguration("type_equipement") =="agenda"){
-				log::add('google_agenda', 'debug', "Nom équipement:" . $eqLogic->getHumanName());
+				google_agenda::add_log("debug","Nom équipement:" . $eqLogic->getHumanName());
 				$eqLogic->Synchronisation_google();
 			}
 			if ($eqLogic->getConfiguration("type_equipement") =="filtre"){
-					log::add('google_agenda', 'debug', "Nom équipement:" . $eqLogic->getHumanName());
-					$eqLogic->recup_filtre();
-					
-				}
+				google_agenda::add_log("debug","Nom équipement:" . $eqLogic->getHumanName());
+				$eqLogic->recup_filtre();
+				
+			}
 		}
 	}
 
