@@ -115,10 +115,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<form class="form-horizontal">
 					<fieldset>
 						<div class="form-group">
-							<label class="col-sm-3 control-label">{{Nom de l'équipement agenda}}</label>
+							<label class="col-sm-3 control-label">{{Nom de l&apos;équipement agenda}}</label>
 							<div class="col-sm-3">
 								<input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
-								<input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement agenda}}"/>
+								<input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l&apos;équipement agenda}}"/>
 							</div>
 						</div>
 						<div class="form-group">
@@ -192,7 +192,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						</div>
 						<div id="div_Type_filtre">
 							<div class="form-group">
-								<label class="col-sm-3 control-label">{{Filtre d'évènement}}</label>
+								<label class="col-sm-3 control-label">{{Filtre d&apos;évènement}}</label>
 								<div class="col-sm-6">
 									<input id="filtre"type="text" class="eqLogicAttr form-control" data-l1key="configuration1" data-l2key="filtre"/>
 								</div>
@@ -269,6 +269,80 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 	</div>
 </div>
+<script>
+$(".li_eqLogic").on('click', function (event) {
+
+  if (event.ctrlKey) {
+    var type = $('body').attr('data-page')
+    var url = '/index.php?v=d&m='+type+'&p='+type+'&id='+$(this).attr('data-eqlogic_id')
+    window.open(url).focus()
+  } else {
+    jeedom.eqLogic.cache.getCmd = Array();
+    if ($('.eqLogicThumbnailDisplay').html() != undefined) {
+      $('.eqLogicThumbnailDisplay').hide();
+    }
+    $('.eqLogic').hide();
+    if ('function' == typeof (prePrintEqLogic)) {
+      prePrintEqLogic($(this).attr('data-eqLogic_id'));
+    }
+    if (isset($(this).attr('data-eqLogic_type')) && isset($('.' + $(this).attr('data-eqLogic_type')))) {
+      $('.' + $(this).attr('data-eqLogic_type')).show();
+    } else {
+      $('.eqLogic').show();
+    }
+    if($('.li_eqLogic').length != 0){
+      $('.li_eqLogic').removeClass('active');
+    }
+    $(this).addClass('active');
+    if($('.li_eqLogic[data-eqLogic_id='+$(this).attr('data-eqLogic_id')+']').html() != undefined){
+      $('.li_eqLogic[data-eqLogic_id='+$(this).attr('data-eqLogic_id')+']').addClass('active');
+    }
+
+    $('.nav-tabs a:not(.eqLogicAction)').first().click()
+    $.showLoading()
+    jeedom.eqLogic.print({
+      type: isset($(this).attr('data-eqLogic_type')) ? $(this).attr('data-eqLogic_type') : eqType,
+      id: $(this).attr('data-eqLogic_id'),
+      status : 1,
+      error: function (error) {
+        $.hideLoading();
+        $('#div_alert').showAlert({message: error.message, level: 'danger'});
+      },
+      success: function (data) {
+        $('body .eqLogicAttr').value('');
+        if(isset(data) && isset(data.timeout) && data.timeout == 0){
+          data.timeout = '';
+        }
+        $('body').setValues(data, '.eqLogicAttr');
+        if ('function' == typeof (printEqLogic)) {
+          printEqLogic(data);
+        }
+        if ('function' == typeof (addCmdToTable)) {
+          $('.cmd').remove();
+          for (var i in data.cmd) {
+            addCmdToTable(data.cmd[i]);
+          }
+        }
+        $('body').delegate('.cmd .cmdAttr[data-l1key=type]', 'change', function () {
+          jeedom.cmd.changeType($(this).closest('.cmd'));
+        });
+
+        
+        $('body').delegate('.cmd .cmdAttr[data-l1key=subType]', 'change', function () {
+          jeedom.cmd.changeSubType($(this).closest('.cmd'));
+        });
+        addOrUpdateUrl('id',data.id);
+        $.hideLoading();
+        modifyWithoutSave = false;
+        setTimeout(function(){
+          modifyWithoutSave = false;
+        },1000)
+      }
+    });
+  }
+  return false;
+});
+</script>
 
 <?php include_file('desktop', 'google_agenda', 'js', 'google_agenda');?>
 <?php include_file('core', 'plugin.template', 'js');?>
