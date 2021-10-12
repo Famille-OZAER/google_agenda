@@ -6,7 +6,7 @@
     "require": "3.0",
     "category": "organization",
     "author": "OZAER Michaël",
-    "changelog": "https://raw.githack.com/Famille-OZAER/google_agenda/master/docs/changelog.html",
+    "changelog": "https://raw.githack.com/Famille-OZAER/google_agenda/main/docs/changelog.html",
     "documentation": "",
     "compatibility": [
         "miniplus",
