@@ -18,8 +18,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					<?php
 					foreach ($eqLogics as $eqLogic) {
 						if ($eqLogic->getConfiguration('type_equipement') == 'agenda') {	
-							$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-							echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId() . '" style="' . $opacity .'"><a>' . $eqLogic->getHumanName(true) . '</a></li>';
+							$opacity = ($eqLogic->getIsEnable()) ? 1 : 0.4;
+							echo '<li class="cursor li_eqLogic " data-eqLogic_id="' . $eqLogic->getId() . '" style= opacity:' . $opacity .'><a>' . $eqLogic->getHumanName(true) . '</a></li>';
 						}
 					}
 					?>
@@ -30,8 +30,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					
 					foreach ($eqLogics as $eqLogic) {
 						if ($eqLogic->getConfiguration('type_equipement') == 'filtre') {	
-							$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-							echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId() . '" style="' . $opacity .'"><a>' . $eqLogic->getHumanName(true) . '</a></li>';
+							$opacity = ($eqLogic->getIsEnable()) ? 1 : 0.4;
+							echo '<li class="cursor li_eqLogic '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '" style= opacity:' . $opacity .'><a>' . $eqLogic->getHumanName(true) . '</a></li>';
 						}
 					}
 					?>
@@ -44,20 +44,20 @@ $eqLogics = eqLogic::byType($plugin->getId());
 		<legend><i class="fa fa-cog"></i>  {{Gestion}}</legend>
 		<div class="eqLogicThumbnailContainer">
 			
-			<div class="cursor eqLogicAction" data-action="ajout_agenda" style="text-align: center; background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+			<div class="cursor eqLogicAction" data-action="ajout_agenda" style="" >
 				<i class="fa fa-plus-circle" style="font-size : 6em;color:#94ca02;"></i>
 				<br>
 				<span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-word;white-space: pre-wrap;word-wrap: break-word;color:#94ca02">{{Ajouter un agenda}}</span>
 			</div>
-			<div class="cursor eqLogicAction" id="btn_filtre" data-action="ajout_filtre" style="display:none;text-align: center; background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+			<div class="cursor eqLogicAction" id="btn_filtre" data-action="ajout_filtre" style="display:none;" >
 				<i class="fa fa-plus-circle" style="font-size : 6em;color:#94ca02;"></i>
 				<br>
 				<span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-word;white-space: pre-wrap;word-wrap: break-word;color:#94ca02">{{Ajouter un filtre}}</span>
 			</div>
-			<div class="cursor eqLogicAction" data-action="gotoPluginConf" style="text-align: center; background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
+			<div class="cursor eqLogicAction" data-action="gotoPluginConf" style="">
 				<i class="fa fa-wrench" style="font-size : 6em;color:#767676;"></i>
 				<br>
-				<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-word;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Configuration}}</span>
+				<span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-word;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Configuration}}</span>
 			</div>
 		</div>
 		<legend><i class="fa fa-table"></i> {{Mes Agendas}}</legend>
@@ -66,8 +66,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			<?php
 				foreach ($eqLogics as $eqLogic) {
 					if ($eqLogic->getConfiguration('type_equipement') == 'agenda') {	
-						$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-						echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="text-align: center; background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
+						$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
+						echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '" style="" >';
 						echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
 						echo "<br>";
 						echo '<span class="name" style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
@@ -79,7 +79,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 		<script>
 			if ($('div #equipements_agendas .eqLogicDisplayCard').length != 0){
 				$('#btn_filtre').show();
-				$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
+				//$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
 			}
 		</script>
 		<legend id="legende_filtres"><i class="fa fa-table" ></i> {{Mes Filtres}}</legend>
@@ -87,11 +87,12 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			<?php
 			foreach ($eqLogics as $eqLogic) {
 				if ($eqLogic->getConfiguration('type_equipement') == 'filtre') {
-					$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-					echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="text-align: center; background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
+					$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
+					echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '" style="" >';
 							echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
 							echo "<br>";
-							echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
+							//echo '<span class="name" style="position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
+                  			echo '<span class="name" style="">' . $eqLogic->getHumanName(true, true) . '</span>';
 					echo '</div>';
 				}
 			}
@@ -258,6 +259,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<th>{{ID}}</th>
 						<th>{{Nom}}</th>
 						<th>{{Type}}</th>
+                        <th>{{Etat}}</th>
 						<th>{{Action}}</th>
 					</tr>
 					</thead>
@@ -270,78 +272,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 	</div>
 </div>
 <script>
-$(".li_eqLogic").on('click', function (event) {
 
-  if (event.ctrlKey) {
-    var type = $('body').attr('data-page')
-    var url = '/index.php?v=d&m='+type+'&p='+type+'&id='+$(this).attr('data-eqlogic_id')
-    window.open(url).focus()
-  } else {
-    jeedom.eqLogic.cache.getCmd = Array();
-    if ($('.eqLogicThumbnailDisplay').html() != undefined) {
-      $('.eqLogicThumbnailDisplay').hide();
-    }
-    $('.eqLogic').hide();
-    if ('function' == typeof (prePrintEqLogic)) {
-      prePrintEqLogic($(this).attr('data-eqLogic_id'));
-    }
-    if (isset($(this).attr('data-eqLogic_type')) && isset($('.' + $(this).attr('data-eqLogic_type')))) {
-      $('.' + $(this).attr('data-eqLogic_type')).show();
-    } else {
-      $('.eqLogic').show();
-    }
-    if($('.li_eqLogic').length != 0){
-      $('.li_eqLogic').removeClass('active');
-    }
-    $(this).addClass('active');
-    if($('.li_eqLogic[data-eqLogic_id='+$(this).attr('data-eqLogic_id')+']').html() != undefined){
-      $('.li_eqLogic[data-eqLogic_id='+$(this).attr('data-eqLogic_id')+']').addClass('active');
-    }
-
-    $('.nav-tabs a:not(.eqLogicAction)').first().click()
-    $.showLoading()
-    jeedom.eqLogic.print({
-      type: isset($(this).attr('data-eqLogic_type')) ? $(this).attr('data-eqLogic_type') : eqType,
-      id: $(this).attr('data-eqLogic_id'),
-      status : 1,
-      error: function (error) {
-        $.hideLoading();
-        $('#div_alert').showAlert({message: error.message, level: 'danger'});
-      },
-      success: function (data) {
-        $('body .eqLogicAttr').value('');
-        if(isset(data) && isset(data.timeout) && data.timeout == 0){
-          data.timeout = '';
-        }
-        $('body').setValues(data, '.eqLogicAttr');
-        if ('function' == typeof (printEqLogic)) {
-          printEqLogic(data);
-        }
-        if ('function' == typeof (addCmdToTable)) {
-          $('.cmd').remove();
-          for (var i in data.cmd) {
-            addCmdToTable(data.cmd[i]);
-          }
-        }
-        $('body').delegate('.cmd .cmdAttr[data-l1key=type]', 'change', function () {
-          jeedom.cmd.changeType($(this).closest('.cmd'));
-        });
-
-        
-        $('body').delegate('.cmd .cmdAttr[data-l1key=subType]', 'change', function () {
-          jeedom.cmd.changeSubType($(this).closest('.cmd'));
-        });
-        addOrUpdateUrl('id',data.id);
-        $.hideLoading();
-        modifyWithoutSave = false;
-        setTimeout(function(){
-          modifyWithoutSave = false;
-        },1000)
-      }
-    });
-  }
-  return false;
-});
 </script>
 
 <?php include_file('desktop', 'google_agenda', 'js', 'google_agenda');?>

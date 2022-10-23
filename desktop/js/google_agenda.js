@@ -22,8 +22,121 @@ $('document').ready(function(){
 		$('#btn_filtre').show();
 		$('#legende_filtres').show();
       	$('.bs-sidebar .filtres').show();
-		$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  
+		/*$('div .eqLogicThumbnailContainer .eqLogicAction').last().css('left', 280);  */
 	}
+});
+$(".li_eqLogic").on('click', function (event) {
+  $.hideAlert()
+  if (event.ctrlKey) {
+    var type = $('body').attr('data-page')
+    var url = 'index.php?v=d&m=' + type + '&p=' + type + '&id=' + $(this).attr('data-eqlogic_id')
+    window.open(url).focus()
+  } else {
+    jeedom.eqLogic.cache.getCmd = Array()
+    if ($('.eqLogicThumbnailDisplay').html() != undefined) {
+      $('.eqLogicThumbnailDisplay').hide()
+    }
+    $('.eqLogic').hide()
+    if ('function' == typeof(prePrintEqLogic)) {
+      prePrintEqLogic($(this).attr('data-eqLogic_id'))
+    }
+    if (isset($(this).attr('data-eqLogic_type')) && isset($('.' + $(this).attr('data-eqLogic_type')))) {
+      $('.' + $(this).attr('data-eqLogic_type')).show()
+    } else {
+      $('.eqLogic').show()
+    }
+    if($('.li_eqLogic').length != 0){
+      $('.li_eqLogic').removeClass('active');
+    }
+        if($('.li_eqLogic[data-eqLogic_id='+$(this).attr('data-eqLogic_id')+']').html() != undefined){
+      $('.li_eqLogic[data-eqLogic_id='+$(this).attr('data-eqLogic_id')+']').addClass('active');
+    }
+    $(this).addClass('active')
+    $('.nav-tabs a:not(.eqLogicAction)').first().click()
+    $.showLoading()
+    jeedom.eqLogic.print({
+      type: isset($(this).attr('data-eqLogic_type')) ? $(this).attr('data-eqLogic_type') : eqType,
+      id: $(this).attr('data-eqLogic_id'),
+      status: 1,
+	  getCmdState : 1,
+      error: function(error) {
+        $.hideLoading()
+        $.fn.showAlert({
+          message: error.message,
+          level: 'danger'
+        })
+      },
+      success: function(data) {
+        $('body .eqLogicAttr').value('')
+        if (isset(data) && isset(data.timeout) && data.timeout == 0) {
+          data.timeout = ''
+        }
+        $('body').setValues(data, '.eqLogicAttr')
+		if (!isset(data.category.opening)) $('input[data-l2key="opening"]').prop('checked', false)
+
+        if ('function' == typeof(printEqLogic)) {
+          printEqLogic(data)
+        }
+		$('.cmd').remove()
+		for (var i in data.cmd) {
+		 if(data.cmd[i].type == 'info'){
+            data.cmd[i].state = String(data.cmd[i].state).replace(/<[^>]*>?/gm, '');
+            data.cmd[i]['htmlstate'] =  '<span class="cmdTableState"';
+            data.cmd[i]['htmlstate'] += 'data-cmd_id="' + data.cmd[i].id+ '"';
+            data.cmd[i]['htmlstate'] += 'title="{{Date de valeur}} : ' + data.cmd[i].valueDate + '<br/>{{Date de collecte}} : ' + data.cmd[i].collectDate;
+            if(data.cmd[i].state.length > 50){
+              data.cmd[i]['htmlstate'] += '<br/>'+data.cmd[i].state.replaceAll('"','&quot;');
+            }
+            data.cmd[i]['htmlstate'] += '" >';
+            data.cmd[i]['htmlstate'] += data.cmd[i].state.substring(0, 50) +  ' ' + data.cmd[i].unite;
+            data.cmd[i]['htmlstate'] += '<span>';
+          }else{
+            data.cmd[i]['htmlstate'] = '';
+          }
+          if(typeof addCmdToTable == 'function'){
+            addCmdToTable(data.cmd[i])
+          }else{
+            addCmdToTableDefault(data.cmd[i]);
+          }
+        }
+        $('.cmdTableState').each(function() {
+          jeedom.cmd.addUpdateFunction($(this).attr('data-cmd_id'), function(_options) {
+            _options.value = String(_options.value).replace(/<[^>]*>?/gm, '');
+            let cmd = $('.cmdTableState[data-cmd_id=' + _options.cmd_id + ']')
+            let title = '{{Date de collecte}} : ' + _options.collectDate+' - {{Date de valeur}} ' + _options.valueDate;
+            if(_options.value.length > 50){
+              title += ' - '+_options.value;
+            }
+            cmd.attr('title', title)
+            cmd.empty().append(_options.value.substring(0, 50) + ' ' + _options.unit);
+            cmd.css('color','var(--logo-primary-color)');
+            setTimeout(function(){
+              cmd.css('color','');
+            }, 1000);
+          });
+        })
+        $('#div_pageContainer').on({
+          'change': function(event) {
+            jeedom.cmd.changeType($(this).closest('.cmd'))
+          }
+        }, '.cmd .cmdAttr[data-l1key=type]')
+
+        $('#div_pageContainer').on({
+          'change': function(event) {
+            jeedom.cmd.changeSubType($(this).closest('.cmd'))
+          }
+        }, '.cmd .cmdAttr[data-l1key=subType]')
+
+        jeedomUtils.addOrUpdateUrl('id', data.id)
+        $.hideLoading()
+        modifyWithoutSave = false
+        setTimeout(function() {
+          modifyWithoutSave = false
+        }, 1000)
+      }
+    })
+  }
+  return false
 });
 $('#bt_linkToUser').on('click', function () {
     $.ajax({
@@ -64,20 +177,30 @@ function addCmdToTable(_cmd) {
     tr += '<td>';
     tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
+  
     tr += '</td>';
+    if (typeof jeeFrontEnd !== 'undefined' && jeeFrontEnd.jeedomVersion !== 'undefined') {
+        tr += '<td>';
+        tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>';
+        tr += '</td>';
+    }
     tr += '<td>';
     if (is_numeric(_cmd.id)) {
         tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
+      
         tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
     }
     tr += '</td>';
     tr += '</tr>';
     $('#table_cmd tbody').append(tr);
     $('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
-    if (isset(_cmd.type)) {
-        $('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
-    }
-    jeedom.cmd.changeType($('#table_cmd tbody tr:last'), init(_cmd.subType));
+   // if (isset(_cmd.type)) {
+   //     $('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
+   // }
+    const $tr = $('#table_cmd tbody tr:last');
+    $tr.setValues(_cmd, '.cmdAttr');
+    jeedom.cmd.changeType($tr, init(_cmd.subType));
+  	$tr.find('.cmdAttr[data-l1key=type],.cmdAttr[data-l1key=subType]').prop("disabled", true);
 }
 function printEqLogic(_eqLogic) {
 	actionOptions = [];

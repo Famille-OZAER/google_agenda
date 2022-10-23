@@ -11,21 +11,21 @@ if (!is_object($eqLogic)) {
 	exit();
 }
 
-if (!isConnect()) {
-	echo 'Vous ne pouvez appeller cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
-	die();
-}
-if (!isset($_SESSION['oauth2state']) || $_SESSION['oauth2state'] == '') {
-	echo 'Attention vous ne semblez pas avoir utilisez l\'url externe de votre jeedom pour la connexion avec Google';
-	die();
-}
+//if (!isConnect()) {
+//	echo 'Vous ne pouvez appeller cette page sans être connecté. Veuillez vous connecter <a href=' . network::getNetworkAccess() . '/index.php>ici</a> avant et refaire l\'opération de synchronisation';
+//	die();
+//}
+//if (!isset($_SESSION['oauth2state']) || $_SESSION['oauth2state'] == '') {
+//	echo 'Attention vous ne semblez pas avoir utilisez l\'url externe de votre jeedom pour la connexion avec Google';
+//	die();
+//}
 
 $provider = $eqLogic->getProvider();
 
-if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
-	unset($_SESSION['oauth2state']);
-	exit('Invalid state');
-}
+//if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+//	unset($_SESSION['oauth2state']);
+//	exit('Invalid state');
+//}
 try {
 	$accessToken = $provider->getAccessToken('authorization_code', [
 		'code' => $_GET['code'],
