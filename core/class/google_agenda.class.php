@@ -345,7 +345,7 @@ class google_agenda extends eqLogic {
       if ($endtime_event == strtotime('+1 day 00:00:00') && strtotime($evenement['Debut']) <> strtotime('+1 day 00:00:00')) {//Si fin à 00:00 et que ce n'est pas un évènement "instantané" alors on mets la fin à 23:59:59
         $endtime_event = $endtime_event - 1;
       }
-       if (strtotime($evenement['Debut']) <= strtotime('+0 day 23:59:59')) {
+       if (strtotime($evenement['Debut']) <= strtotime('+0 day 23:59:59') && $evenement['Jour_entier'] != "Oui") {
           google_agenda::add_log("debug","événement de la veille");
          return $return;
        }
@@ -648,10 +648,10 @@ class google_agenda extends eqLogic {
       //google_agenda::add_log("debug", strtotime($evenement['Debut']) . "<=". $endtime);
       //google_agenda::add_log("debug", $endtime_event . ">=" . $starttime);
       if ($jour =="aujourdhui" && strtotime($evenement['Debut']) < $starttime ){
-       return "";
+       //return "";
       }
       if ($jour =="demain" && strtotime($evenement['Debut']) < $starttime ){
-       return "";
+       //return "";
       }
       if (strtotime($evenement['Debut']) <= $endtime && $endtime_event >= $starttime) {
 
