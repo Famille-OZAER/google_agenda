@@ -416,7 +416,7 @@ class google_agenda extends eqLogic {
       $this->save();
       return;
     }
-	$cmd_commande_debut=cmd::byEqLogicIdAndLogicalId($this->getId(),"Commande_debut");
+	  $cmd_commande_debut=cmd::byEqLogicIdAndLogicalId($this->getId(),"Commande_debut");
     if(!is_object($cmd_commande_debut)){
       $this->save();
       return;
@@ -676,13 +676,22 @@ class google_agenda extends eqLogic {
               if ($return["fin"]<$endtime_event){
                 $return["fin"] = $endtime_event;
               }
-          //$return["fin"] = $endtime_event;
+              //$return["fin"] = $endtime_event;
 
-        }
+            } 
           }
           //foreach ($arr_filtre as $filtre_simple) {
           //   google_agenda::add_log("debug",$filtre_simple);
           //}
+        }elseif ($filtre ==  "*"){
+          $trouve=true;
+          if ($return["debut"]>strtotime($evenement['Debut'])){
+            $return["debut"] = strtotime($evenement['Debut']);
+          }
+          if ($return["fin"]<$endtime_event){
+            $return["fin"] = $endtime_event;
+          }
+          return $return;
         }else{
 
           if(strpos(strtolower($recherche_dans), strtolower($filtre))!== false){
