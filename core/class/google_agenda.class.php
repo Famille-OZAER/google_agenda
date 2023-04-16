@@ -290,7 +290,7 @@ class google_agenda extends eqLogic {
       }
     }
     if(trim($return, ',')!=""){
-      self::add_log("debug",trim($return, ','));
+      //self::add_log("debug",trim($return, ','));
     }
 
     return trim($return, ',');
@@ -322,7 +322,7 @@ class google_agenda extends eqLogic {
       }
     }
     if(trim($return, ',')!=""){
-      self::add_log("debug",trim($return, ','));
+      //self::add_log("debug",trim($return, ','));
     }
     return trim($return, ',');
   }
@@ -362,7 +362,7 @@ class google_agenda extends eqLogic {
     }
     //self::add_log("debug",trim($return, ','));
     if(trim($return, ',')!=""){
-      self::add_log("debug",trim($return, ','));
+      //self::add_log("debug",trim($return, ','));
     }
     return trim($return, ',');
   }
@@ -404,28 +404,18 @@ class google_agenda extends eqLogic {
     $sur_titre=$this->getConfiguration("sur_titre");
     $sur_contenu=$this->getConfiguration("sur_contenu");
     $trouve=false;
-    $evenement_aujourdhui=$this->recup_infos_evenement($eqLogic_agenda,$filtre,"aujourdhui",$sur_titre,$sur_contenu, $trouve);
-
-
     $cmd_aujourdhui=cmd::byEqLogicIdAndLogicalId($this->getId(),"aujourdhui");
-    if(!is_object($cmd_aujourdhui)){
-      return;
-    }
     $cmd_hier=cmd::byEqLogicIdAndLogicalId($this->getId(),"hier");
-    if(!is_object($cmd_hier)){
-      $this->save();
-      return;
-    }
     $cmd_demain=cmd::byEqLogicIdAndLogicalId($this->getId(),"demain");
-    if(!is_object($cmd_demain)){
+    $cmd_commande_debut=cmd::byEqLogicIdAndLogicalId($this->getId(),"Commande_debut");
+
+    if(!is_object($cmd_aujourdhui) || !is_object($cmd_hier) || !is_object($cmd_demain) || !is_object($cmd_commande_debut)){
+      self::add_log("debug","Ajout des commandes manquantes");
       $this->save();
       return;
     }
-	  $cmd_commande_debut=cmd::byEqLogicIdAndLogicalId($this->getId(),"Commande_debut");
-    if(!is_object($cmd_commande_debut)){
-      $this->save();
-      return;
-    }
+    $evenement_aujourdhui=$this->recup_infos_evenement($eqLogic_agenda,$filtre,"aujourdhui",$sur_titre,$sur_contenu, $trouve);
+    
     if($trouve){
       //self::add_log("debug","evenement aujourdhui : Oui");
       //self::add_log("debug",$filtre);
@@ -449,7 +439,6 @@ class google_agenda extends eqLogic {
       //self::add_log("debug",$filtre . " : evenement demain : Oui");
       //self::add_log("debug","evenement aujourdhui : Oui");
       //self::add_log("debug",$evenement_demain);
-     
       //self::add_log("debug","heure de début :". date('H:i',$evenement_demain["debut"]));
       //self::add_log("debug","heure de fin :". date('H:i',$evenement_demain["fin"]));
       $this->checkAndUpdateCmd('demain', 1);
@@ -473,12 +462,12 @@ class google_agenda extends eqLogic {
 
 
     //Vérification des commandes début
-    if($cmd_aujourdhui->execCmd() == 0 & $cmd_hier->execCmd() == 0 & $Force_execution== false){
-      //self::add_log("debug","Aucune execution d'action car pas de filtre hier et aujourd'hui (" . $this->getName() . ")");
+    if($cmd_aujourdhui->execCmd() == 0 & $cmd_commande_debut->execCmd() == 0 & $Force_execution== false){
+      //self::add_log("debug","Aucune execution d'action de fin car pas de filtre hier et aujourd'hui (" . $this->getName() . ")");
       return;
     }
-    if($cmd_aujourdhui->execCmd() == 1 & $cmd_hier->execCmd() == 1& $Force_execution== false){
-      //self::add_log("debug","Aucune execution d'action car filtre existant hier et aujourd'hui (" . $this->getName() . ")");
+    if($cmd_aujourdhui->execCmd() == 1 & $cmd_commande_debut->execCmd() == 1 & $Force_execution== false){
+      //self::add_log("debug","Aucune execution d'action de debut car filtre existant hier et aujourd'hui (" . $this->getName() . ")");
       return;
     }
 
@@ -518,16 +507,16 @@ class google_agenda extends eqLogic {
                     scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
                   }else{
                     $options = $cmd['options'];
-                   if ($cmd['cmd'] == 'equipement'){
+                    if ($cmd['cmd'] == 'equipement'){
                       $i=0;
-                     $mess='';
-                     foreach ($options as $value) {
-                       if($i == 0){
-                          $value=eqLogic::byId(trim($value, "#eqLogic"))->getHumanName();
-                        }
-                       $mess = $mess . " " . $value;
-                       $i = $i+1;
-                    }
+                      $mess='';
+                      foreach ($options as $value) {
+                          if($i == 0){
+                            $value=eqLogic::byId(trim($value, "#eqLogic"))->getHumanName();
+                          }
+                            $mess = $mess . " " . $value;
+                        $i = $i+1;
+                      }
                       self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . $mess);
                    
                    }else{
@@ -562,7 +551,7 @@ class google_agenda extends eqLogic {
     }
 
     //Vérification des commandes fin
-    if($cmd_aujourdhui->execCmd() == 0 & $cmd_hier->execCmd() == 1){
+    if($cmd_aujourdhui->execCmd() == 0 ){
  
       $cmds = $this->getConfiguration('action_fin');
       foreach ($cmds as $cmd) {
@@ -582,28 +571,58 @@ class google_agenda extends eqLogic {
           $execute_action =1;
         }
         if ($execute_action==1){
+          $this->checkAndUpdateCmd('Commande_debut', 0);
           self::add_log("debug","Execution des actions de fin car filtre existant hier mais pas aujourd'hui (" . $this->getName() . ")");
           try {
             $options = array();
             if (isset($cmd['options'])) {
-               $this->checkAndUpdateCmd('Commande_debut', 0);
-              $options = $cmd['options'];
-              self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
-
-              scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+              if (is_numeric (trim($cmd['cmd'], "#"))){
+                $options = $cmd['options'];
+                $cmd1=cmd::byId(trim($cmd['cmd'], "#"));
+                self::add_log("debug",'execution action début: ' . $cmd1->getHumanName(). ': ' . implode(" " ,$cmd['options']));
+                scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+              }else{
+                 if (is_numeric (trim($cmd['cmd'], "#"))){
+                	$options = $cmd['options'];
+                    $cmd1=cmd::byId(trim($cmd['cmd'], "#"));
+                    self::add_log("debug",'execution action début: ' . $cmd1->getHumanName(). ': ' . implode(" " ,$cmd['options']));
+                    scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+                  }else{
+                    $options = $cmd['options'];
+                    if ($cmd['cmd'] == 'equipement'){
+                      $i=0;
+                      $mess='';
+                      foreach ($options as $value) {
+                          if($i == 0){
+                            $value=eqLogic::byId(trim($value, "#eqLogic"))->getHumanName();
+                          }
+                            $mess = $mess . " " . $value;
+                        $i = $i+1;
+                      }
+                      self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . $mess);
+                   
+                   }else{
+                      self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
+                   
+                   }
+                   	
+              
+                    
+                    scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+                   }
+                }
             }else{
-               $this->checkAndUpdateCmd('Commande_debut', 0);
               if (is_numeric (trim($cmd['cmd'], "#"))){
                 $cmd=cmd::byId(trim($cmd['cmd'], "#"));
                 if(is_object($cmd)){
-                  self::add_log("debug",'execution action fin: ' . $cmd->getHumanName());
+                  self::add_log("debug",'execution action début: ' . $cmd->getHumanName());
                   $cmd->execCmd();
                 }
               }else{
                 self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
                 scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
               }
-            }
+            }			
           }catch (Exception $e) {
             self::add_log("error", 'Erreur lors de l\'éxecution de ' . $cmd['cmd'] . ' Détails : ' . $e->getMessage());
           }
@@ -613,34 +632,65 @@ class google_agenda extends eqLogic {
     }
    //Vérification si les commandes de début on été executée, si evenement est supprimé, execution des action de fin
     if($cmd_aujourdhui->execCmd() == 0 & $cmd_hier->execCmd() == 0 & $cmd_commande_debut->execCmd() == 1){
+      $this->checkAndUpdateCmd('Commande_debut', 0);
        $cmds = $this->getConfiguration('action_fin');
       foreach ($cmds as $cmd) {
         if ($cmd['cmd']==""){
           continue;
         }
         
-    	$this->checkAndUpdateCmd('Commande_debut', 0);
-
-        self::add_log("debug","Execution des actions de fin car filtre existant hier mais pas aujourd'hui (" . $this->getName() . ")");
+        //self::add_log("debug","Execution des actions de fin car filtre existant hier mais pas aujourd'hui (" . $this->getName() . ")");
+        
         try {
           $options = array();
-          if (isset($cmd['options'])) {
-            $options = $cmd['options'];
-            self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
-
-            scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
-          }else{
-            if (is_numeric (trim($cmd['cmd'], "#"))){
-              $cmd=cmd::byId(trim($cmd['cmd'], "#"));
-              if(is_object($cmd)){
-                self::add_log("debug",'execution action fin: ' . $cmd->getHumanName());
-                $cmd->execCmd();
-              }
+            if (isset($cmd['options'])) {
+              if (is_numeric (trim($cmd['cmd'], "#"))){
+                $options = $cmd['options'];
+                $cmd1=cmd::byId(trim($cmd['cmd'], "#"));
+                self::add_log("debug",'execution action fin: ' . $cmd1->getHumanName(). ': ' . implode(" " ,$cmd['options']));
+                scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+              }else{
+                 if (is_numeric (trim($cmd['cmd'], "#"))){
+                	$options = $cmd['options'];
+                    $cmd1=cmd::byId(trim($cmd['cmd'], "#"));
+                    self::add_log("debug",'execution action fin: ' . $cmd1->getHumanName(). ': ' . implode(" " ,$cmd['options']));
+                    scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+                  }else{
+                    $options = $cmd['options'];
+                    if ($cmd['cmd'] == 'equipement'){
+                      $i=0;
+                      $mess='';
+                      foreach ($options as $value) {
+                          if($i == 0){
+                            $value=eqLogic::byId(trim($value, "#eqLogic"))->getHumanName();
+                          }
+                            $mess = $mess . " " . $value;
+                        $i = $i+1;
+                      }
+                      self::add_log("debug",'execution action fin: ' . $cmd['cmd'] . ': ' . $mess);
+                   
+                   }else{
+                      self::add_log("debug",'execution action fin: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
+                   
+                   }
+                   	
+              
+                    
+                    scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+                   }
+                }
             }else{
-              self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
-              scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
-            }
-          }
+              if (is_numeric (trim($cmd['cmd'], "#"))){
+                $cmd=cmd::byId(trim($cmd['cmd'], "#"));
+                if(is_object($cmd)){
+                  self::add_log("debug",'execution action fin: ' . $cmd->getHumanName());
+                  $cmd->execCmd();
+                }
+              }else{
+                self::add_log("debug",'execution action fin: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
+                scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+              }
+            }	
         }catch (Exception $e) {
           self::add_log("error", 'Erreur lors de l\'éxecution de ' . $cmd['cmd'] . ' Détails : ' . $e->getMessage());
         }
