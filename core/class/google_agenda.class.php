@@ -29,8 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class google_agenda extends eqLogic {
 
-  var $cron_en_cours=false;
-  static function add_log($level = 'debug',$Log){
+    static function add_log($level = 'debug',$Log){
 
     if (is_array($Log)) $Log = json_encode($Log);
     $function_name = debug_backtrace(false, 2)[1]['function'];
@@ -62,10 +61,7 @@ class google_agenda extends eqLogic {
   }
   public static function cron30() {
 
-    while ($cron_en_cours == true) {
-
-    }
-    foreach (self::byType('google_agenda') as $eqLogic) {
+   foreach (self::byType('google_agenda') as $eqLogic) {
       try {
         if ($eqLogic->getConfiguration("type_equipement") =="agenda"){
           //self::add_log("debug","--------------------------------------------------------------------");
@@ -264,10 +260,10 @@ class google_agenda extends eqLogic {
         return;
       }
     }
-    //self::add_log("debug",'evenements : ' . json_encode($evenements));
-    //if (count($evenements) > 0) {
-    //  $this->setCache('evenements', $evenements);
-    //}
+    self::add_log("debug",'evenements : ' . json_encode($evenements));
+    if (count($evenements) > 0) {
+      $this->setCache('evenements', $evenements);
+    }
     $this->setCache('evenements', $evenements);
     $this->checkAndUpdateCmd('lastsync', date('Y-m-d H:i:s'));
     $this->checkAndUpdateCmd('maintenant', $this->recup_evenements_en_cours());
@@ -510,25 +506,44 @@ class google_agenda extends eqLogic {
                     if ($cmd['cmd'] == 'equipement'){
                       $i=0;
                       $mess='';
+                      $execute=true;
+                      $eqLogic="";
                       foreach ($options as $value) {
                           if($i == 0){
-                            $value=eqLogic::byId(trim($value, "#eqLogic"))->getHumanName();
+                            
+                            $eqLogic_id=trim($value, "#eqLogic");
+                            $eqLogic=eqLogic::byId($eqLogic_id);
+                            $value=$eqLogic->getHumanName();
                           }
-                            $mess = $mess . " " . $value;
-                        $i = $i+1;
+
+                          if ($value == "activate" && $eqLogic->getIsEnable() == 1) {
+                            self::add_log("debug",'Pas execution action début: ' . $cmd['cmd'] . ': ' . $mess . " car l'équipement est déjà actif");
+                            $execute=false;
+                          }
+                          if ($value == "deactivate" && $eqLogic->getIsEnable() == 0) {
+                            self::add_log("debug",'Pas execution action début: ' . $cmd['cmd'] . ': ' . $mess . " car l'équipement est déjà désactivé");
+                            $execute=false;
+                          }
+                          $mess = $mess . " " . $value;
+                          $i = $i+1;
                       }
-                      self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . $mess);
+                      if($execute){
+                         self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . $mess);
+                      }
+                     
                    
-                   }else{
-                      self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
+                  }else{
+                    self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . implode(" " ,$cmd['options']));
                    
-                   }
+                  }
                    	
               
+                    if ($execute){
+                      scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
+                    }
                     
-                    scenarioExpression::createAndExec('action', $cmd['cmd'], $options);
-                   }
                 }
+              }
             }else{
               if (is_numeric (trim($cmd['cmd'], "#"))){
                 $cmd=cmd::byId(trim($cmd['cmd'], "#"));
@@ -592,13 +607,23 @@ class google_agenda extends eqLogic {
                     if ($cmd['cmd'] == 'equipement'){
                       $i=0;
                       $mess='';
+                      $execute=true;
                       foreach ($options as $value) {
                           if($i == 0){
                             $value=eqLogic::byId(trim($value, "#eqLogic"))->getHumanName();
+                            if ($value == "activate" || $value == "activate"){
+                              if($cmd['cmd']){
+                                $cmd1=cmd::byId(trim($cmd['cmd'], "#"));
+                                $cmd1->execCmd();
+                                self::add_log("debug",'test: ' . implode($cmd1));
+                              }
+                              $execute=false;
+                            }
                           }
                             $mess = $mess . " " . $value;
                         $i = $i+1;
                       }
+
                       self::add_log("debug",'execution action début: ' . $cmd['cmd'] . ': ' . $mess);
                    
                    }else{
@@ -1036,8 +1061,9 @@ class google_agendaCmd extends cmd {
       if ($eqLogic->getConfiguration("type_equipement") =="filtre"){
         //self::add_log("debug","Nom équipement:" . $eqLogic->getHumanName());
         $eqLogic->recup_filtre(true);
-
       }
+      $this->getEqLogic()->refreshWidget();
+      $this->getEqLogic()->refresh();
       google_agenda::add_log("debug","Fin Rafraichir " . $this->getEqLogic()->getName());
     }
   }
