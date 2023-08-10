@@ -1,20 +1,17 @@
 {
     "id": "google_agenda",
     "name": "Google agenda",
-    "description": "Plugin basé le plugin google agenda de Jeedom SAS et permettant de recuperer les événements de Google Agenda. Il est capable d’interpréter les titres des événements comme interaction.IMPORTANT : ce plugin nécessite d'avoir un compte dev chez Google (tout le monde peut en avoir c'est gratuit et sans impact). La démarche est expliqué dans la documentation. ",
+    "description": "Plugin basé le plugin google agenda de Jeedom SAS et permettant de récuperer les événements de Google Agenda. Il est capable d’interpréter les titres des événements comme interaction.IMPORTANT : ce plugin nécessite d'avoir un compte dev chez Google (tout le monde peut en avoir c'est gratuit et sans impact). La démarche est expliqué dans la documentation. ",
     "licence": "AGPL",
     "require": "4.0",
     "category": "organization",
     "author": "OZAER Michaël",
     "changelog": "https://raw.githack.com/Famille-OZAER/google_agenda/main/docs/changelog.html",
     "changelog_beta": "https://raw.githack.com/Famille-OZAER/google_agenda/main/docs/changelog.html",
-    "documentation": "",
+    "documentation": "https://raw.githack.com/Famille-OZAER/google_agenda/main/docs/changelog.html",
+    "documentation_beta": "https://raw.githack.com/Famille-OZAER/google_agenda/main/docs/changelog.html",
     "compatibility": [
-        "miniplus",
-        "smart",
         "rpi",
-        "docker",
-        "diy",
         "V4"
     ]
 }
