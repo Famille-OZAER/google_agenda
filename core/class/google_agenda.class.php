@@ -49,7 +49,7 @@ class google_agenda extends eqLogic {
 
 
   }
-  function supp_accents( $str, $charset='utf-8' ) {
+  static function supp_accents( $str, $charset='utf-8' ) {
     $str = htmlentities( $str, ENT_NOQUOTES, $charset );
     $str = preg_replace( '#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str );
     $str = preg_replace( '#&([A-za-z]{2})(?:lig);#', '\1', $str );
@@ -90,7 +90,7 @@ class google_agenda extends eqLogic {
     //self::add_log("debug","********************************************************************",$eqLogic);
   }
 
-  public function ping() {
+  public static function ping() {
     $ping = "NOK";
     $exec_string = 'sudo ping -n -c 1 -t 255 8.8.8.8';
     exec($exec_string, $output, $return);
@@ -762,7 +762,7 @@ class google_agenda extends eqLogic {
     
   }
 
-  public function recup_infos_evenement($eqLogic_agenda,$filtre,$jour,$sur_titre,$sur_contenu, &$trouve) {
+  public static function recup_infos_evenement($eqLogic_agenda,$filtre,$jour,$sur_titre,$sur_contenu, &$trouve) {
     $return = "";
     $trouve=false;
     if (!is_array($eqLogic_agenda->getCache('evenements')) || count($eqLogic_agenda->getCache('evenements')) == 0) {
@@ -852,7 +852,7 @@ class google_agenda extends eqLogic {
     return $return;
   }
 
-  public function ajout_filtre($name) {
+  public static function ajout_filtre($name) {
     $eqLogic = new eqLogic();
     $eqLogic->setEqType_name('google_agenda');
     $eqLogic->setName($name);
@@ -862,7 +862,7 @@ class google_agenda extends eqLogic {
     $eqLogic->save();
   }
 
-  public function ajout_agenda($name) {
+  public static function ajout_agenda($name) {
     $eqLogic = new eqLogic();
     $eqLogic->setEqType_name('google_agenda');
     $eqLogic->setName($name);
